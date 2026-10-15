@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "title": "Aziz Furniture",
+    "tagline": "The origin of furniture",
+    "description": "Aziz Furniture — handcrafted Egyptian furniture. Browse our showroom online and order living rooms, bedrooms, dining sets and more."
+  },
+  "brand": {
+    "name": "Aziz",
+    "sub": "Furniture"
+  },
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "collections": "Collections",
+    "about": "About",
+    "contact": "Contact",
+    "search": "Search",
+    "cart": "Cart",
+    "account": "Account",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "categories": "Categories",
+    "skipToContent": "Skip to content"
+  },
+  "categories": {
+    "living": "Living rooms",
+    "bedrooms": "Bedrooms",
+    "dining": "Dining rooms",
+    "kids": "Kids rooms",
+    "office": "Office",
+    "decor": "Decor & accessories"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light mode",
+    "dark": "Dark mode"
+  },
+  "language": {
+    "switch": "عربي",
+    "label": "Switch to Arabic"
+  },
+  "footer": {
+    "about": "Handcrafted Egyptian furniture, built to last for generations.",
+    "shop": "Shop",
+    "company": "Company",
+    "follow": "Follow us",
+    "rights": "All rights reserved."
+  },
+  "home": {
+    "heroTitle": "Furniture made with heart",
+    "heroText": "Discover handcrafted pieces for every room in your home.",
+    "heroCta": "Browse the showroom",
+    "placeholder": "Page content coming soon."
+  },
+  "dashboard": {
+    "title": "Store management",
+    "overview": "Overview",
+    "products": "Products",
+    "inventory": "Inventory",
+    "orders": "Orders",
+    "customers": "Customers",
+    "settings": "Settings",
+    "backToStore": "Back to store",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "placeholder": "This section is under construction."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "The page you are looking for doesn't exist.",
+    "back": "Back to home"
+  }
+}

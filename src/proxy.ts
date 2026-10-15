@@ -1,0 +1,44 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { defaultLocale, hasLocale, LOCALE_COOKIE, type Locale } from "@/i18n/config";
+
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+/** Pick a locale from the saved cookie, then Accept-Language, then the default. */
+function detectLocale(request: NextRequest): Locale {
+  const saved = request.cookies.get(LOCALE_COOKIE)?.value;
+  if (saved && hasLocale(saved)) return saved;
+
+  const accepted = (request.headers.get("accept-language") ?? "")
+    .split(",")
+    .map((part) => {
+      const [tag, q] = part.trim().split(";q=");
+      return { lang: tag.toLowerCase().split("-")[0], q: q ? Number(q) : 1 };
+    })
+    .sort((a, b) => b.q - a.q);
+
+  const match = accepted.find((a) => hasLocale(a.lang))?.lang;
+  return match && hasLocale(match) ? match : defaultLocale;
+}
+
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const first = pathname.split("/")[1] ?? "";
+
+  if (hasLocale(first)) {
+    // Remember the language the visitor is browsing in.
+    const response = NextResponse.next();
+    if (request.cookies.get(LOCALE_COOKIE)?.value !== first) {
+      response.cookies.set(LOCALE_COOKIE, first, { path: "/", maxAge: ONE_YEAR, sameSite: "lax" });
+    }
+    return response;
+  }
+
+  const url = request.nextUrl.clone();
+  url.pathname = `/${detectLocale(request)}${pathname === "/" ? "" : pathname}`;
+  return NextResponse.redirect(url);
+}
+
+export const config = {
+  // Skip Next internals, API routes and any file with an extension (images, icons, robots.txt…).
+  matcher: ["/((?!_next|api|.*\\..*).*)"],
+};
