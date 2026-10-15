@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, hasLocale, LOCALE_COOKIE, type Locale } from "@/i18n/config";
 
+// Kept in sync with src/lib/auth/session.ts (not imported: that module pulls in the DB).
+const SESSION_COOKIE = "aziz_session";
+
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 /** Pick a locale from the saved cookie, then Accept-Language, then the default. */
@@ -25,6 +28,12 @@ export function proxy(request: NextRequest) {
   const first = pathname.split("/")[1] ?? "";
 
   if (hasLocale(first)) {
+    // Optimistic gate only (no DB call): bounce visitors without a session cookie.
+    // The dashboard layout and every admin action still verify the session and role.
+    if (pathname.startsWith(`/${first}/dashboard`) && !request.cookies.has(SESSION_COOKIE)) {
+      return NextResponse.redirect(new URL(`/${first}/login`, request.url));
+    }
+
     // Remember the language the visitor is browsing in.
     const response = NextResponse.next();
     if (request.cookies.get(LOCALE_COOKIE)?.value !== first) {
