@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { createHash, randomBytes } from "node:crypto";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions, users } from "@/db/schema";
 
@@ -41,7 +41,8 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     .select({ id: users.id, email: users.email, name: users.name, role: users.role })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))
-    .where(and(eq(sessions.id, hashToken(token)), gt(sessions.expiresAt, new Date())))
+    // Compare against the DB clock: no request-time Date in render, one time source.
+    .where(and(eq(sessions.id, hashToken(token)), gt(sessions.expiresAt, sql`now()`)))
     .limit(1);
   return user ?? null;
 });
