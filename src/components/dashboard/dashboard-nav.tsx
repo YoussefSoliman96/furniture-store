@@ -9,14 +9,16 @@ import {
   Receipt,
   Settings,
   Store,
+  Tags,
   Users,
 } from "lucide-react";
 import { localizeHref, type Locale } from "@/i18n/config";
 import { NavLink } from "@/components/ui/nav-link";
-import { dashboardSections, type DashboardLabels } from "./sections";
+import { dashboardNav, type DashboardLabels } from "./sections";
 
 const icons = {
   overview: LayoutDashboard,
+  categories: Tags,
   products: Package,
   inventory: Boxes,
   orders: Receipt,
@@ -39,7 +41,7 @@ export function DashboardNav({
 }) {
   return (
     <nav aria-label={labels.title} className="flex flex-1 flex-col gap-1 p-3">
-      {(["overview", ...dashboardSections] as const).map((key) => {
+      {dashboardNav.map((key) => {
         const Icon = icons[key];
         const href = localizeHref(locale, key === "overview" ? "/dashboard" : `/dashboard/${key}`);
         return (

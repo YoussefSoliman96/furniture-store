@@ -1,0 +1,131 @@
+import Link from "next/link";
+import { localizeHref } from "@/i18n/config";
+import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { getInventory, getRecentMovements, type StockFilter } from "@/lib/data/admin";
+import { fill, formatDateTime, formatNumber, loc } from "@/lib/format";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { AdjustStockForm } from "@/components/dashboard/adjust-stock-form";
+
+export async function generateMetadata() {
+  const t = await getDictionary();
+  return { title: t.inventory.title };
+}
+
+const filters: StockFilter[] = ["all", "low", "out"];
+
+export default async function InventoryPage({ searchParams }: PageProps<"/[lang]/dashboard/inventory">) {
+  const raw = (await searchParams).filter;
+  const filter = filters.find((f) => f === raw) ?? "all";
+  const locale = await getLocale();
+  const t = (await getDictionary()).inventory;
+  const [items, movements] = await Promise.all([getInventory(filter), getRecentMovements()]);
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title={t.title} intro={t.intro} />
+
+      <nav className="flex gap-2">
+        {filters.map((f) => (
+          <Link
+            key={f}
+            href={localizeHref(locale, f === "all" ? "/dashboard/inventory" : `/dashboard/inventory?filter=${f}`)}
+            aria-current={f === filter ? "page" : undefined}
+            className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors ${
+              f === filter
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-surface text-muted hover:border-primary hover:text-primary"
+            }`}
+          >
+            {t.filters[f]}
+          </Link>
+        ))}
+      </nav>
+
+      <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+        <table className="w-full min-w-[860px] text-sm">
+          <thead className="border-b border-border text-xs text-muted uppercase">
+            <tr>
+              <th className="px-4 py-3 text-start font-semibold">{t.product}</th>
+              <th className="px-4 py-3 text-start font-semibold">{t.category}</th>
+              <th className="px-4 py-3 text-start font-semibold">{t.stock}</th>
+              <th className="px-4 py-3 text-start font-semibold">{t.adjust}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {items.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-muted">
+                  {t.noProducts}
+                </td>
+              </tr>
+            )}
+            {items.map((p) => {
+              const status = p.stock <= 0 ? "out" : p.stock <= p.lowStockThreshold ? "low" : "ok";
+              return (
+                <tr key={p.id}>
+                  <td className="px-4 py-3">
+                    <p className="font-semibold">{loc(locale, p.nameAr, p.nameEn)}</p>
+                    <p className="text-xs text-muted" dir="ltr">
+                      {p.sku}
+                    </p>
+                  </td>
+                  <td className="px-4 py-3 text-muted">{loc(locale, p.categoryNameAr, p.categoryNameEn)}</td>
+                  <td className="px-4 py-3">
+                    <span className="flex items-center gap-2">
+                      <span className="w-8 text-lg font-bold tabular-nums">{formatNumber(locale, p.stock)}</span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                          status === "out"
+                            ? "bg-red-500/15 text-red-700 dark:text-red-300"
+                            : status === "low"
+                              ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                              : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                        }`}
+                      >
+                        {t.statuses[status]}
+                      </span>
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <AdjustStockForm productId={p.id} t={t} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <section className="rounded-xl border border-border bg-surface">
+        <h2 className="border-b border-border px-5 py-4 font-bold">{t.recent}</h2>
+        {movements.length === 0 ? (
+          <p className="px-5 py-6 text-sm text-muted">{t.noMovements}</p>
+        ) : (
+          <ul className="divide-y divide-border text-sm">
+            {movements.map((m) => (
+              <li key={m.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3">
+                <span
+                  dir="ltr"
+                  className={`w-14 font-bold tabular-nums ${m.delta > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}
+                >
+                  {m.delta > 0 ? `+${m.delta}` : m.delta}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="font-semibold">{loc(locale, m.productNameAr, m.productNameEn)}</span>
+                  <span className="ms-2 text-muted">
+                    {t.reasons[m.reason]}
+                    {m.note && ` — ${m.note}`}
+                  </span>
+                </span>
+                <span className="text-xs text-muted">
+                  {m.userName && `${fill(t.by, { name: m.userName })} · `}
+                  {formatDateTime(locale, m.createdAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
