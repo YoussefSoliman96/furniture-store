@@ -3,8 +3,6 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { dashboardSections, isDashboardSection } from "@/components/dashboard/sections";
 import { SectionPlaceholder } from "@/components/dashboard/section-placeholder";
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return dashboardSections.map((section) => ({ section }));
 }

@@ -3,8 +3,6 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { categories, categoryHref, type CategorySlug } from "@/config/navigation";
 import { PagePlaceholder, pageMetadata } from "@/components/store/page-placeholder";
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return categories.map((category) => ({ category }));
 }
