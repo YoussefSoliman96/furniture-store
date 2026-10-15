@@ -1,25 +1,32 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Languages } from "lucide-react";
 import { switchLocalePath, type Locale } from "@/i18n/config";
 
-export function LanguageSwitcher({
-  to,
-  text,
-  label,
-  className = "",
-}: {
-  to: Locale;
-  text: string;
-  label: string;
-  className?: string;
-}) {
+type Props = { to: Locale; text: string; label: string; className?: string };
+
+/** Links to the current page in the other language (falls back to its home page
+ *  while the pathname is unknown, e.g. in a prerendered shell). */
+export function LanguageSwitcher(props: Props) {
+  return (
+    <Suspense fallback={<SwitchLink {...props} href={`/${props.to}`} />}>
+      <CurrentPageSwitch {...props} />
+    </Suspense>
+  );
+}
+
+function CurrentPageSwitch(props: Props) {
   const pathname = usePathname();
+  return <SwitchLink {...props} href={switchLocalePath(pathname, props.to)} />;
+}
+
+function SwitchLink({ to, text, label, className = "", href }: Props & { href: string }) {
   return (
     <Link
-      href={switchLocalePath(pathname, to)}
+      href={href}
       hrefLang={to}
       lang={to}
       aria-label={label}

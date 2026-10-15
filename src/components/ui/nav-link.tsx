@@ -1,25 +1,34 @@
 "use client";
 
+import { Suspense, type ComponentProps } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ComponentProps } from "react";
 
-/** Link that marks itself as the current page. `exact` for index routes like "/en". */
-export function NavLink({
-  href,
-  exact = false,
-  className = "",
-  activeClassName = "",
-  ...props
-}: ComponentProps<typeof Link> & { href: string; exact?: boolean; activeClassName?: string }) {
+type LinkProps = ComponentProps<typeof Link> & { href: string };
+type ActiveOptions = { exact?: boolean; activeClassName?: string };
+
+/**
+ * Link that marks itself as the current page. `exact` for index routes like "/en".
+ * The pathname is unknown while prerendering the shell of not-yet-built dynamic
+ * routes, so the active state resolves behind Suspense; the fallback is the same
+ * link without it, keeping the markup crawlable and the layout static.
+ */
+export function NavLink({ exact, activeClassName, ...props }: LinkProps & ActiveOptions) {
+  return (
+    <Suspense fallback={<Link {...props} />}>
+      <ActiveLink {...props} exact={exact} activeClassName={activeClassName} />
+    </Suspense>
+  );
+}
+
+function ActiveLink({ exact = false, activeClassName = "", className = "", ...props }: LinkProps & ActiveOptions) {
   const pathname = usePathname();
-  const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+  const active = exact ? pathname === props.href : pathname === props.href || pathname.startsWith(`${props.href}/`);
   return (
     <Link
-      href={href}
+      {...props}
       aria-current={active ? "page" : undefined}
       className={`${className} ${active ? activeClassName : ""}`}
-      {...props}
     />
   );
 }

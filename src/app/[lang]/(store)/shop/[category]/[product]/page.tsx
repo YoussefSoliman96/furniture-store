@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ShoppingBag } from "lucide-react";
@@ -27,7 +28,31 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/shop/[cate
   };
 }
 
-export default async function ProductPage({ params }: PageProps<"/[lang]/shop/[category]/[product]">) {
+export default function ProductPage({ params }: PageProps<"/[lang]/shop/[category]/[product]">) {
+  // params are read inside Suspense so products added after the build get an
+  // instant shell, then are rendered and cached on first visit.
+  return (
+    <Suspense fallback={<ProductSkeleton />}>
+      <ProductContent params={params} />
+    </Suspense>
+  );
+}
+
+function ProductSkeleton() {
+  return (
+    <section className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2 lg:px-8">
+      <div className="aspect-[4/3] animate-pulse rounded-2xl bg-surface-muted" />
+      <div className="space-y-4">
+        <div className="h-4 w-24 animate-pulse rounded bg-surface-muted" />
+        <div className="h-9 w-3/4 animate-pulse rounded bg-surface-muted" />
+        <div className="h-7 w-32 animate-pulse rounded bg-surface-muted" />
+        <div className="h-24 animate-pulse rounded bg-surface-muted" />
+      </div>
+    </section>
+  );
+}
+
+async function ProductContent({ params }: Pick<PageProps<"/[lang]/shop/[category]/[product]">, "params">) {
   const { category, product: slug } = await params;
   const product = await getProduct(category, slug);
   if (!product) notFound();

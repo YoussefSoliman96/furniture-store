@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
@@ -23,15 +23,12 @@ export function Drawer({
   triggerClassName?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const pathname = usePathname();
-
-  // Close after navigating from a link inside the drawer.
-  useEffect(() => {
-    ref.current?.close();
-  }, [pathname]);
 
   return (
     <>
+      <Suspense fallback={null}>
+        <CloseOnNavigate dialog={ref} />
+      </Suspense>
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
@@ -65,4 +62,14 @@ export function Drawer({
       </dialog>
     </>
   );
+}
+
+/** Closes the drawer after navigating from a link inside it. Behind Suspense
+ *  because the pathname is unknown in prerendered shells of dynamic routes. */
+function CloseOnNavigate({ dialog }: { dialog: RefObject<HTMLDialogElement | null> }) {
+  const pathname = usePathname();
+  useEffect(() => {
+    dialog.current?.close();
+  }, [pathname, dialog]);
+  return null;
 }

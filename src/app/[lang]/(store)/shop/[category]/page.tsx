@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getCategories, getCategoryBySlug, getProducts } from "@/lib/data/catalog";
 import { categoryHref } from "@/config/navigation";
 import { pageMetadata } from "@/components/store/page-placeholder";
-import { CategoryChips, ProductGrid } from "@/components/store/product-grid";
+import { CategoryChips, ProductGrid, ProductGridSkeleton } from "@/components/store/product-grid";
 import { fill, formatNumber, loc } from "@/lib/format";
 
 export async function generateStaticParams() {
@@ -22,7 +23,17 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/shop/[cate
   };
 }
 
-export default async function CategoryPage({ params }: PageProps<"/[lang]/shop/[category]">) {
+export default function CategoryPage({ params }: PageProps<"/[lang]/shop/[category]">) {
+  // params are read inside Suspense so categories added after the build get an
+  // instant shell, then are rendered and cached on first visit.
+  return (
+    <Suspense fallback={<ProductGridSkeleton />}>
+      <CategoryContent params={params} />
+    </Suspense>
+  );
+}
+
+async function CategoryContent({ params }: Pick<PageProps<"/[lang]/shop/[category]">, "params">) {
   const { category: slug } = await params;
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
