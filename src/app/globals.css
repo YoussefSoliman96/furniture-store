@@ -79,3 +79,59 @@
   background-color: currentColor;
   mask: url("/logo-mark.png") center / contain no-repeat;
 }
+
+/* Off-canvas drawer (<dialog>) sliding in from the inline-start edge. */
+@layer components {
+  .drawer {
+    --drawer-from: -100%;
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+    margin: 0;
+    width: min(20rem, 85vw);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    translate: var(--drawer-from) 0;
+    transition:
+      translate 0.25s ease,
+      overlay 0.25s allow-discrete,
+      display 0.25s allow-discrete;
+  }
+  [dir="rtl"] .drawer {
+    --drawer-from: 100%;
+  }
+  .drawer[open] {
+    translate: 0 0;
+  }
+  @starting-style {
+    .drawer[open] {
+      translate: var(--drawer-from) 0;
+    }
+  }
+  .drawer::backdrop {
+    background: rgb(0 0 0 / 0);
+    transition:
+      background 0.25s ease,
+      overlay 0.25s allow-discrete,
+      display 0.25s allow-discrete;
+  }
+  .drawer[open]::backdrop {
+    background: rgb(0 0 0 / 0.5);
+  }
+  @starting-style {
+    .drawer[open]::backdrop {
+      background: rgb(0 0 0 / 0);
+    }
+  }
+  html:has(.drawer[open]) {
+    overflow: hidden;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .drawer,
+    .drawer::backdrop {
+      transition: none;
+    }
+  }
+}
