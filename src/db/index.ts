@@ -11,7 +11,9 @@ const globalForDb = globalThis as unknown as { pg?: postgres.Sql };
 const client =
   globalForDb.pg ??
   postgres(url, {
-    max: 10,
+    // Builds prerender in one worker per CPU, each with its own pool; keep this
+    // small against connection-limited servers (local PGlite, Supabase free tier).
+    max: Number(process.env.DATABASE_POOL_MAX ?? 10),
     // Supabase's transaction pooler (port 6543) doesn't support prepared statements.
     prepare: false,
   });
