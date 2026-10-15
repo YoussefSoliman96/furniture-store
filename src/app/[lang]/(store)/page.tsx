@@ -2,11 +2,16 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { localizeHref } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { categories, categoryHref } from "@/config/navigation";
+import { categoryHref } from "@/config/navigation";
+import { getCategories, getFeaturedProducts } from "@/lib/data/catalog";
+import { loc } from "@/lib/format";
+import { CategoryIcon } from "@/components/ui/category-icon";
+import { ProductGrid } from "@/components/store/product-grid";
 
 export default async function HomePage() {
   const locale = await getLocale();
   const t = await getDictionary();
+  const [categories, featured] = await Promise.all([getCategories(), getFeaturedProducts()]);
   const Arrow = locale === "ar" ? ArrowLeft : ArrowRight;
 
   return (
@@ -38,21 +43,41 @@ export default async function HomePage() {
 
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <h2 className="font-display text-3xl font-semibold text-foreground">{t.nav.categories}</h2>
-        <ul className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
-          {categories.map((slug) => (
-            <li key={slug}>
+        <ul className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+          {categories.map((c) => (
+            <li key={c.id}>
               <Link
-                href={localizeHref(locale, categoryHref(slug))}
-                className="group flex aspect-[4/3] items-end rounded-2xl border border-border bg-surface-muted p-5 transition-colors hover:border-primary"
+                href={localizeHref(locale, categoryHref(c.slug))}
+                className="group flex h-full flex-col gap-3 rounded-2xl border border-border bg-surface-muted p-5 transition-colors hover:border-primary"
               >
-                <span className="font-semibold text-foreground transition-colors group-hover:text-primary">
-                  {t.categories[slug]}
+                <span className="inline-flex size-12 items-center justify-center rounded-xl bg-surface text-primary">
+                  <CategoryIcon name={c.icon} className="size-6" />
                 </span>
+                <span className="font-semibold text-foreground transition-colors group-hover:text-primary">
+                  {loc(locale, c.nameAr, c.nameEn)}
+                </span>
+                <span className="line-clamp-2 text-sm text-muted">{loc(locale, c.descriptionAr, c.descriptionEn)}</span>
               </Link>
             </li>
           ))}
         </ul>
       </section>
+
+      {featured.length > 0 && (
+        <section className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="font-display text-3xl font-semibold text-foreground">{t.shop.featured}</h2>
+            <Link
+              href={localizeHref(locale, "/shop")}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+            >
+              {t.shop.viewAll}
+              <Arrow className="size-4" aria-hidden />
+            </Link>
+          </div>
+          <ProductGrid products={featured} locale={locale} t={t.shop} />
+        </section>
+      )}
     </>
   );
 }

@@ -22,14 +22,6 @@
     "categories": "Categories",
     "skipToContent": "Skip to content"
   },
-  "categories": {
-    "living": "Living rooms",
-    "bedrooms": "Bedrooms",
-    "dining": "Dining rooms",
-    "kids": "Kids rooms",
-    "office": "Office",
-    "decor": "Decor & accessories"
-  },
   "theme": {
     "toggle": "Toggle theme",
     "light": "Light mode",
@@ -63,11 +55,140 @@
     "backToStore": "Back to store",
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar",
-    "placeholder": "This section is under construction."
+    "placeholder": "This section is under construction.",
+    "categories": "Categories",
+    "signedInAs": "Signed in as",
+    "logout": "Sign out",
+    "stats": {
+      "products": "Active products",
+      "categories": "Categories",
+      "stockUnits": "Units in stock",
+      "stockValue": "Stock value",
+      "lowStock": "Low stock",
+      "outOfStock": "Out of stock"
+    },
+    "lowStockList": "Needs restocking",
+    "allGood": "All products are well stocked.",
+    "viewInventory": "Open inventory"
   },
   "notFound": {
     "title": "Page not found",
     "text": "The page you are looking for doesn't exist.",
     "back": "Back to home"
+  },
+  "auth": {
+    "title": "Admin sign in",
+    "subtitle": "Store management is restricted to administrators.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "errors": {
+      "missing": "Enter your email and password.",
+      "invalid": "Incorrect email or password.",
+      "notAdmin": "This account doesn't have admin access.",
+      "locked": "Too many attempts. Try again in 15 minutes."
+    }
+  },
+  "shop": {
+    "title": "Shop",
+    "intro": "Browse every piece in our showroom.",
+    "all": "All",
+    "productCount": "{count} products",
+    "empty": "No products in this category yet.",
+    "inStock": "In stock",
+    "lowStock": "Only {count} left",
+    "outOfStock": "Out of stock",
+    "sale": "Sale",
+    "featured": "Featured pieces",
+    "viewAll": "View all",
+    "material": "Material",
+    "dimensions": "Dimensions",
+    "sku": "Code",
+    "addToCart": "Add to cart",
+    "orderingSoon": "Online ordering is coming soon — visit our showroom or message us on Facebook to order.",
+    "backTo": "Back to {name}"
+  },
+  "adminCategories": {
+    "title": "Categories",
+    "intro": "Categories shown in the store menu, home page and footer. Order controls how they appear.",
+    "new": "New category",
+    "edit": "Edit category",
+    "nameEn": "Name (English)",
+    "nameAr": "Name (Arabic)",
+    "slug": "URL slug",
+    "slugHint": "Lowercase letters, numbers and dashes. Leave empty to generate from the English name.",
+    "descriptionEn": "Description (English)",
+    "descriptionAr": "Description (Arabic)",
+    "icon": "Icon",
+    "active": "Visible in store",
+    "status": "Status",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "show": "Show",
+    "hide": "Hide",
+    "products": "Products",
+    "order": "Order",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "actions": "Actions",
+    "save": "Save changes",
+    "create": "Create category",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDelete": "Yes, delete it",
+    "deleteWarning": "This permanently deletes the category.",
+    "hasProducts": "Move or delete its products first",
+    "empty": "No categories yet.",
+    "errors": {
+      "required": "This field is required.",
+      "tooLong": "Too long.",
+      "slugInvalid": "Use lowercase letters, numbers and dashes only.",
+      "slugTaken": "Another category already uses this slug.",
+      "icon": "Choose an icon."
+    }
+  },
+  "inventory": {
+    "title": "Inventory",
+    "intro": "Stock levels in the warehouse. Every change is recorded in the movement log.",
+    "filters": {
+      "all": "All",
+      "low": "Low stock",
+      "out": "Out of stock"
+    },
+    "product": "Product",
+    "category": "Category",
+    "stock": "Stock",
+    "status": "Status",
+    "statuses": {
+      "ok": "In stock",
+      "low": "Low",
+      "out": "Out"
+    },
+    "adjust": "Adjust stock",
+    "quantity": "Quantity",
+    "quantityHint": "Negative numbers remove stock.",
+    "reason": "Reason",
+    "note": "Note (optional)",
+    "apply": "Apply",
+    "applying": "Saving…",
+    "reasons": {
+      "restock": "Restock",
+      "sale": "Sale",
+      "return": "Return",
+      "adjustment": "Correction",
+      "damage": "Damaged"
+    },
+    "recent": "Recent movements",
+    "noMovements": "No stock movements yet.",
+    "noProducts": "No products match this filter.",
+    "by": "by {name}",
+    "updated": "Stock updated.",
+    "errors": {
+      "invalidQuantity": "Enter a whole number other than 0.",
+      "invalidReason": "Choose a reason.",
+      "insufficient": "Not enough stock to remove that many."
+    }
   }
 }

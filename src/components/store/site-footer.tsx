@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { localizeHref } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { categories, categoryHref, FACEBOOK_URL, mainNav } from "@/config/navigation";
+import { categoryHref, FACEBOOK_URL, mainNav } from "@/config/navigation";
+import { getCategories } from "@/lib/data/catalog";
+import { loc } from "@/lib/format";
 import { Logo } from "@/components/ui/logo";
 
 export async function SiteFooter() {
   const locale = await getLocale();
   const t = await getDictionary();
+  const categories = await getCategories();
   const linkClass = "text-muted transition-colors hover:text-primary";
 
   return (
@@ -18,10 +21,10 @@ export async function SiteFooter() {
         </div>
 
         <FooterColumn title={t.footer.shop}>
-          {categories.map((slug) => (
-            <li key={slug}>
-              <Link href={localizeHref(locale, categoryHref(slug))} className={linkClass}>
-                {t.categories[slug]}
+          {categories.map((c) => (
+            <li key={c.id}>
+              <Link href={localizeHref(locale, categoryHref(c.slug))} className={linkClass}>
+                {loc(locale, c.nameAr, c.nameEn)}
               </Link>
             </li>
           ))}

@@ -2,8 +2,11 @@ import Link from "next/link";
 import { Search, ShoppingBag, User } from "lucide-react";
 import { localizeHref } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { categories, categoryHref, mainNav } from "@/config/navigation";
+import { categoryHref, mainNav } from "@/config/navigation";
+import { getCategories } from "@/lib/data/catalog";
+import { loc } from "@/lib/format";
 import { Logo } from "@/components/ui/logo";
+import { CategoryIcon } from "@/components/ui/category-icon";
 import { NavLink } from "@/components/ui/nav-link";
 import { Drawer } from "@/components/ui/drawer";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -15,6 +18,7 @@ const iconButton =
 export async function SiteHeader() {
   const locale = await getLocale();
   const t = await getDictionary();
+  const categories = await getCategories();
   const otherLocale = locale === "ar" ? "en" : "ar";
 
   return (
@@ -79,15 +83,15 @@ export async function SiteHeader() {
 
       {/* Desktop: category strip */}
       <nav aria-label={t.nav.categories} className="hidden border-t border-border lg:block">
-        <ul className="mx-auto flex h-11 max-w-7xl items-center justify-center gap-8 px-8 text-sm">
-          {categories.map((slug) => (
-            <li key={slug}>
+        <ul className="mx-auto flex h-11 max-w-7xl items-center justify-center gap-7 overflow-x-auto px-8 text-sm whitespace-nowrap">
+          {categories.map((c) => (
+            <li key={c.id}>
               <NavLink
-                href={localizeHref(locale, categoryHref(slug))}
+                href={localizeHref(locale, categoryHref(c.slug))}
                 className="font-medium text-muted transition-colors hover:text-primary"
                 activeClassName="!text-primary"
               >
-                {t.categories[slug]}
+                {loc(locale, c.nameAr, c.nameEn)}
               </NavLink>
             </li>
           ))}
@@ -101,6 +105,7 @@ export async function SiteHeader() {
 async function MobileNav() {
   const locale = await getLocale();
   const t = await getDictionary();
+  const categories = await getCategories();
   const otherLocale = locale === "ar" ? "en" : "ar";
   const item =
     "flex items-center rounded-lg px-3 py-2.5 font-semibold transition-colors hover:bg-accent";
@@ -127,14 +132,15 @@ async function MobileNav() {
       <nav aria-label={t.nav.categories}>
         <p className="px-3 pb-2 text-xs font-bold tracking-wider text-muted uppercase">{t.nav.categories}</p>
         <ul className="space-y-1">
-          {categories.map((slug) => (
-            <li key={slug}>
+          {categories.map((c) => (
+            <li key={c.id}>
               <NavLink
-                href={localizeHref(locale, categoryHref(slug))}
-                className={`${item} font-medium text-muted`}
+                href={localizeHref(locale, categoryHref(c.slug))}
+                className={`${item} gap-3 font-medium text-muted`}
                 activeClassName="bg-accent !text-primary"
               >
-                {t.categories[slug]}
+                <CategoryIcon name={c.icon} className="size-4.5 shrink-0" />
+                {loc(locale, c.nameAr, c.nameEn)}
               </NavLink>
             </li>
           ))}

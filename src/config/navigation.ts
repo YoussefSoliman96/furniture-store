@@ -10,15 +10,7 @@ export const mainNav = [
   { key: "contact", href: "/contact" },
 ] as const satisfies readonly { key: keyof Dictionary["nav"]; href: string }[];
 
-export const categories = [
-  "living",
-  "bedrooms",
-  "dining",
-  "kids",
-  "office",
-  "decor",
-] as const satisfies readonly (keyof Dictionary["categories"])[];
-
-export type CategorySlug = (typeof categories)[number];
-
-export const categoryHref = (slug: CategorySlug) => `/shop/${slug}`;
+// Categories are managed by admins in the dashboard; see lib/data/catalog.ts.
+export const categoryHref = (slug: string) => `/shop/${slug}`;
+export const productHref = (categorySlug: string, productSlug: string) =>
+  `/shop/${categorySlug}/${productSlug}`;
