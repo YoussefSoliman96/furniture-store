@@ -8,5 +8,14 @@ export const THEME_COOKIE = "theme";
 const script = `(function(){try{var m=document.cookie.match(/(?:^|; )${THEME_COOKIE}=(light|dark)/);var t=m?m[1]:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
 export function ThemeScript() {
-  return <script dangerouslySetInnerHTML={{ __html: script }} />;
+  // Executable only in the server HTML. On client renders React would warn about
+  // (and never run) a <script>, so it becomes inert text/plain there; the mismatch
+  // is expected and suppressed. Pattern from Next's "preventing flash" guide.
+  return (
+    <script
+      type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: script }}
+    />
+  );
 }
