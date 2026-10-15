@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by data-theme on <html> (set before paint by ThemeScript). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --background: #fbf7f2;
+  --surface: #ffffff;
+  --surface-muted: #f5ece3;
+  --foreground: #2a1d13;
+  --muted: #7a6a5c;
+  --border: #eadccd;
+  --primary: #7a5535;
+  --primary-hover: #654429;
+  --primary-foreground: #ffffff;
+  --accent: #fceee5;
+  --accent-foreground: #5b3e25;
+  --ring: #b8875d;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --background: #15100c;
+  --surface: #1e1712;
+  --surface-muted: #271e17;
+  --foreground: #f3e9df;
+  --muted: #a8968a;
+  --border: #352a21;
+  --primary: #c8946a;
+  --primary-hover: #d6a57c;
+  --primary-foreground: #1a120c;
+  --accent: #2c2119;
+  --accent-foreground: #ecd3bc;
+  --ring: #c8946a;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), var(--font-cairo), ui-serif, Georgia, serif;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  /* Arabic display text reads better in Cairo than in a Latin serif. */
+  :lang(ar) .font-display {
+    font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Brand mark rendered as a mask so it follows the theme's primary color. */
+@utility brand-mark {
+  background-color: currentColor;
+  mask: url("/logo-mark.png") center / contain no-repeat;
+}
