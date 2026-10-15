@@ -13,8 +13,8 @@ export async function Logo({ href = "/", className = "" }: { href?: string; clas
     >
       <span className="brand-mark h-10 w-8" aria-hidden />
       <span className="flex flex-col leading-none" aria-hidden>
-        <span className="font-display text-2xl font-semibold tracking-wide uppercase">{brand.name}</span>
-        <span className="text-[0.65rem] font-semibold tracking-[0.25em] text-muted uppercase">{brand.sub}</span>
+        <span className="font-display text-2xl font-semibold tracking-wide uppercase rtl:tracking-normal">{brand.name}</span>
+        <span className="text-[0.65rem] font-semibold tracking-[0.25em] text-muted uppercase rtl:tracking-normal rtl:text-xs">{brand.sub}</span>
       </span>
     </Link>
   );
