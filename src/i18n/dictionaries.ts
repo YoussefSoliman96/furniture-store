@@ -2,12 +2,13 @@ import { lang } from "next/root-params";
 import { notFound } from "next/navigation";
 import { hasLocale, type Locale } from "./config";
 
-const dictionaries = {
+// English is the source of truth for keys; Arabic must match its shape.
+export type Dictionary = typeof import("./dictionaries/en.json");
+
+const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
   ar: () => import("./dictionaries/ar.json").then((m) => m.default),
   en: () => import("./dictionaries/en.json").then((m) => m.default),
-} satisfies Record<Locale, () => Promise<unknown>>;
-
-export type Dictionary = Awaited<ReturnType<(typeof dictionaries)["en"]>>;
+};
 
 /** Current locale from the `[lang]` root segment. Server Components only. */
 export async function getLocale(): Promise<Locale> {
