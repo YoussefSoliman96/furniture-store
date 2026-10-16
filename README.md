@@ -8,12 +8,13 @@ Bilingual (Arabic / English) showroom, store and store-management dashboard for 
 
 ```bash
 npm install
-cp .env.example .env.local      # then set ADMIN_EMAIL / ADMIN_PASSWORD
-npm run db:local                # terminal 1: local Postgres on :5433 (keep running)
-npm run db:migrate              # create tables
-npm run db:seed                 # mock catalog + admin account
-npm run dev                     # terminal 2: http://localhost:3000
+cp .env.example .env.local      # then set DATABASE_URL and ADMIN_EMAIL / ADMIN_PASSWORD
+npm run dev:all                 # migrate + seed + dev server on http://localhost:3000
 ```
+
+`dev:all` is safe to re-run: migrations are skipped once applied, and the seed only fills an empty catalog. Once set up, `npm run dev` is enough.
+
+Using local Postgres instead of Supabase: run `npm run db:local` in another terminal first (port 5433).
 
 - Storefront: `/ar` (default) and `/en`
 - Admin: `/ar/login` → `/ar/dashboard` (admin accounts only)
@@ -24,6 +25,7 @@ npm run dev                     # terminal 2: http://localhost:3000
 
 | Script | What it does |
 | --- | --- |
+| `dev:all` | Migrate, seed, then start the dev server |
 | `db:local` | Start the local Postgres server |
 | `db:generate` | Generate a SQL migration after editing `src/db/schema.ts` |
 | `db:migrate` | Apply migrations to `DATABASE_URL` |
@@ -32,9 +34,11 @@ npm run dev                     # terminal 2: http://localhost:3000
 
 ## Moving to Supabase
 
-1. Create a project; copy the **pooler** connection string (Project Settings → Database).
-2. Set `DATABASE_URL` to it (prepared statements are already disabled for the pooler) and keep `DATABASE_POOL_MAX` small.
-3. Run `npm run db:migrate` and `npm run db:seed` against it once.
+1. Use the **pooler** connection strings (Connect button). The direct `db.<ref>.supabase.co` host is IPv6-only and unreachable from most networks and hosts.
+2. `DATABASE_URL`: transaction pooler, port **6543** (prepared statements are already disabled for it). Keep `DATABASE_POOL_MAX` small.
+3. `DATABASE_MIGRATION_URL`: session pooler, port **5432**, used by `drizzle-kit`.
+4. Add `?sslmode=require` to `DATABASE_URL` and `?uselibpqcompat=true&sslmode=require` to `DATABASE_MIGRATION_URL` (drizzle-kit's `pg` driver otherwise rejects Supabase's own CA), and percent-encode special characters in the password.
+5. Run `npm run dev:all` (or `db:migrate` + `db:seed`) once.
 
 ## How it fits together
 

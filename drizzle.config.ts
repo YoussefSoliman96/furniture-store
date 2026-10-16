@@ -11,5 +11,6 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./drizzle",
   casing: "snake_case",
-  dbCredentials: { url: process.env.DATABASE_URL! },
+  // Migrations need a session connection; Supabase's transaction pooler (the app's URL) isn't one.
+  dbCredentials: { url: (process.env.DATABASE_MIGRATION_URL || process.env.DATABASE_URL)! },
 });
