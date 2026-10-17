@@ -1,12 +1,14 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { defaultLocale, hasLocale, localizeHref } from "@/i18n/config";
 import { getDummyHash, verifyPassword } from "./password";
 import { createSession, destroySession } from "./session";
+import { DEV_SIGNED_OUT_COOKIE, devAutoLoginEnabled } from "./dev";
 
 export type LoginState = { error?: "missing" | "invalid" | "notAdmin" | "locked"; email?: string } | undefined;
 
@@ -44,10 +46,13 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   if (user.role !== "admin") return { error: "notAdmin", email };
 
   await createSession(user.id);
+  (await cookies()).delete(DEV_SIGNED_OUT_COOKIE);
   redirect(localizeHref(locale, "/dashboard"));
 }
 
 export async function logout(formData: FormData) {
   await destroySession();
+  // Dev auto sign-in would log straight back in; pause it until the next manual sign-in.
+  if (devAutoLoginEnabled()) (await cookies()).set(DEV_SIGNED_OUT_COOKIE, "1", { path: "/", httpOnly: true, sameSite: "lax" });
   redirect(localizeHref(localeFrom(formData), "/login"));
 }

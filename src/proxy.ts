@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, hasLocale, LOCALE_COOKIE, type Locale } from "@/i18n/config";
+import { DEV_LOGIN_PATH, DEV_SIGNED_OUT_COOKIE, devAutoLoginEnabled } from "@/lib/auth/dev";
 
 // Kept in sync with src/lib/auth/session.ts (not imported: that module pulls in the DB).
 const SESSION_COOKIE = "aziz_session";
@@ -28,6 +29,16 @@ export function proxy(request: NextRequest) {
   const first = pathname.split("/")[1] ?? "";
 
   if (hasLocale(first)) {
+    // Dev only: sign in as the seeded admin instead of showing the login page.
+    if (devAutoLoginEnabled() && !request.cookies.has(DEV_SIGNED_OUT_COOKIE)) {
+      const toDashboard = pathname.startsWith(`/${first}/dashboard`) && !request.cookies.has(SESSION_COOKIE);
+      if (toDashboard || pathname === `/${first}/login`) {
+        const url = new URL(DEV_LOGIN_PATH, request.url);
+        url.searchParams.set("next", toDashboard ? pathname + request.nextUrl.search : `/${first}/dashboard`);
+        return NextResponse.redirect(url);
+      }
+    }
+
     // Optimistic gate only (no DB call): bounce visitors without a session cookie.
     // The dashboard layout and every admin action still verify the session and role.
     if (pathname.startsWith(`/${first}/dashboard`) && !request.cookies.has(SESSION_COOKIE)) {
