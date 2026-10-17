@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { defaultLocale, locales, localizeHref, type Locale } from "@/i18n/config";
 
-export const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
+// NEXT_PUBLIC_SITE_URL wins; on Vercel, fall back to the production domain it provides to every build.
+const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+export const siteUrl = new URL(
+  process.env.NEXT_PUBLIC_SITE_URL || (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000"),
+);
 
 export const ogLocale: Record<Locale, string> = { ar: "ar_EG", en: "en_US" };
 
