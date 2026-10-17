@@ -46,4 +46,5 @@ Using local Postgres instead of Supabase: run `npm run db:local` in another term
 - **i18n:** every route lives under `src/app/[lang]`; `src/proxy.ts` picks the locale (cookie → `Accept-Language` → Arabic). Strings are in `src/i18n/dictionaries/*.json` and never ship to the browser.
 - **Catalog:** `src/lib/data/catalog.ts` reads are cached (`'use cache'` + tags), so storefront pages are prerendered. Admin actions expire the tags, so changes show up immediately.
 - **Auth:** database sessions (hashed tokens, httpOnly cookie). `requireAdminPage()` guards admin pages, and `assertAdmin()` guards every admin action and read.
+- **Translation:** with `ANTHROPIC_API_KEY` set, the category form fills the English name and description from the Arabic (`src/lib/translate.ts`, Claude via a server action). English stays editable, and a save with only Arabic is translated on the server.
 - **Inventory:** `products.stock` is the running total; `inventory_movements` is the append-only log of every change.

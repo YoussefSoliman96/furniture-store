@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getAdminCategory } from "@/lib/data/admin";
+import { translationEnabled } from "@/lib/translate";
 import { CategoryForm } from "@/components/dashboard/category-form";
 import { PageHeader } from "@/components/dashboard/page-header";
 
@@ -18,7 +19,7 @@ export default async function EditCategoryPage({ params }: PageProps<"/[lang]/da
   return (
     <div className="space-y-6">
       <PageHeader title={t.edit} />
-      <CategoryForm locale={locale} t={t} category={category} />
+      <CategoryForm locale={locale} t={t} canTranslate={translationEnabled()} category={category} />
     </div>
   );
 }

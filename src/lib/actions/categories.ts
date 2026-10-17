@@ -8,6 +8,7 @@ import { categories, products } from "@/db/schema";
 import { defaultLocale, hasLocale, localizeHref } from "@/i18n/config";
 import { assertAdmin } from "@/lib/auth/guard";
 import { TAGS } from "@/lib/data/catalog";
+import { translateToEnglish, translationEnabled } from "@/lib/translate";
 import { isCategoryIcon } from "@/components/ui/category-icon";
 
 type Field = "nameEn" | "nameAr" | "slug" | "descriptionEn" | "descriptionAr" | "icon";
@@ -33,6 +34,25 @@ function expireCatalog() {
   updateTag(TAGS.products);
 }
 
+/**
+ * Admins may write Arabic only: fill empty English fields from the Arabic before
+ * validating. If translation is off or fails, the usual "required" errors show.
+ */
+async function fillMissingEnglish(values: Record<"nameEn" | "nameAr" | "descriptionEn" | "descriptionAr", string>) {
+  if (!translationEnabled()) return;
+  const missing: Record<string, string> = {};
+  if (!values.nameEn && values.nameAr) missing.nameEn = values.nameAr.slice(0, 80);
+  if (!values.descriptionEn && values.descriptionAr) missing.descriptionEn = values.descriptionAr.slice(0, 500);
+  if (Object.keys(missing).length === 0) return;
+  try {
+    const english: Record<string, string> = await translateToEnglish(missing);
+    if (english.nameEn) values.nameEn = english.nameEn.trim().slice(0, 80);
+    if (english.descriptionEn) values.descriptionEn = english.descriptionEn.trim().slice(0, 500);
+  } catch (error) {
+    console.error("Category translation failed:", error);
+  }
+}
+
 export async function saveCategory(_prev: CategoryFormState, formData: FormData): Promise<CategoryFormState> {
   await assertAdmin();
   const localeValue = str(formData, "locale");
@@ -49,6 +69,7 @@ export async function saveCategory(_prev: CategoryFormState, formData: FormData)
     icon: str(formData, "icon"),
     isActive: formData.get("isActive") === "on",
   };
+  await fillMissingEnglish(values);
   if (!values.slug) values.slug = slugify(values.nameEn);
 
   const errors: NonNullable<CategoryFormState>["errors"] = {};

@@ -1,4 +1,5 @@
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { translationEnabled } from "@/lib/translate";
 import { CategoryForm } from "@/components/dashboard/category-form";
 import { PageHeader } from "@/components/dashboard/page-header";
 
@@ -13,7 +14,7 @@ export default async function NewCategoryPage() {
   return (
     <div className="space-y-6">
       <PageHeader title={t.new} />
-      <CategoryForm locale={locale} t={t} />
+      <CategoryForm locale={locale} t={t} canTranslate={translationEnabled()} />
     </div>
   );
 }
