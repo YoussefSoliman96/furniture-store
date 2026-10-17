@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { defaultLocale, locales, localizeHref, type Locale } from "@/i18n/config";
 
-// NEXT_PUBLIC_SITE_URL wins; on Vercel, fall back to the production domain it provides to every build.
+// NEXT_PUBLIC_SITE_URL wins; on Vercel, fall back to the production domain it provides to every
+// build. A localhost value (e.g. copied from .env.local) is ignored there.
 const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const configured = process.env.NEXT_PUBLIC_SITE_URL;
+const usable = configured && !(process.env.VERCEL && /\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(configured));
 export const siteUrl = new URL(
-  process.env.NEXT_PUBLIC_SITE_URL || (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000"),
+  usable ? configured : vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000",
 );
 
 export const ogLocale: Record<Locale, string> = { ar: "ar_EG", en: "en_US" };
