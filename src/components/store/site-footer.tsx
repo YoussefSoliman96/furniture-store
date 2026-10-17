@@ -70,7 +70,8 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
   return (
     <div>
       <h2 className="mb-4 text-sm font-bold text-foreground">{title}</h2>
-      <ul className="space-y-2.5 text-sm">{children}</ul>
+      {/* Phones: 40px-tall links so they are easy to tap; desktop keeps the tighter list. */}
+      <ul className="text-sm md:space-y-2.5 [&_a]:inline-flex [&_a]:min-h-10 [&_a]:items-center md:[&_a]:min-h-0">{children}</ul>
     </div>
   );
 }

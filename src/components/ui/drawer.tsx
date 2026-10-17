@@ -34,7 +34,7 @@ export function Drawer({
         onClick={() => ref.current?.showModal()}
         aria-label={openLabel}
         title={openLabel}
-        className={`inline-flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent ${triggerClassName}`}
+        className={`inline-flex size-10 shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent ${triggerClassName}`}
       >
         <Menu className="size-5" aria-hidden />
       </button>

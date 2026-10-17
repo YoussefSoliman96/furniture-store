@@ -5,7 +5,7 @@ import { adjustStock, type AdjustStockState } from "@/lib/actions/inventory";
 import type { Dictionary } from "@/i18n/dictionaries";
 
 const control =
-  "rounded-md border border-border bg-background px-2 py-1.5 text-sm outline-none transition-colors focus:border-primary";
+  "h-10 rounded-md border border-border bg-background px-2 text-sm outline-none transition-colors focus:border-primary md:h-auto md:py-1.5";
 
 export function AdjustStockForm({ productId, t }: { productId: string; t: Dictionary["inventory"] }) {
   const [state, action, pending] = useActionState<AdjustStockState, FormData>(adjustStock, undefined);
@@ -17,7 +17,7 @@ export function AdjustStockForm({ productId, t }: { productId: string; t: Dictio
   }, [state]);
 
   return (
-    <form ref={formRef} action={action} className="flex flex-wrap items-center gap-2">
+    <form ref={formRef} action={action} className="grid grid-cols-2 items-center gap-2 md:flex md:flex-wrap">
       <input type="hidden" name="productId" value={productId} />
       <input
         name="delta"
@@ -28,7 +28,7 @@ export function AdjustStockForm({ productId, t }: { productId: string; t: Dictio
         aria-label={t.quantity}
         title={t.quantityHint}
         placeholder="±"
-        className={`${control} w-20 tabular-nums`}
+        className={`${control} tabular-nums md:w-20`}
       />
       <select name="reason" aria-label={t.reason} defaultValue="restock" className={control}>
         {Object.entries(t.reasons).map(([value, label]) => (
@@ -37,15 +37,15 @@ export function AdjustStockForm({ productId, t }: { productId: string; t: Dictio
           </option>
         ))}
       </select>
-      <input name="note" maxLength={200} aria-label={t.note} placeholder={t.note} className={`${control} w-36`} />
+      <input name="note" maxLength={200} aria-label={t.note} placeholder={t.note} className={`${control} min-w-0 md:w-36`} />
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
+        className="h-10 rounded-md bg-primary px-4 text-sm font-semibold md:h-auto md:px-3 md:py-1.5 text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
       >
         {pending ? t.applying : t.apply}
       </button>
-      <span aria-live="polite" className="text-xs">
+      <span aria-live="polite" className="text-xs max-md:col-span-2 max-md:empty:hidden">
         {state && "error" in state && <span className="text-red-600 dark:text-red-400">{t.errors[state.error]}</span>}
         {state && "ok" in state && <span className="text-emerald-700 dark:text-emerald-400">{t.updated}</span>}
       </span>

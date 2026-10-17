@@ -34,7 +34,7 @@ export async function SiteHeader() {
           <MobileNav />
         </Drawer>
 
-        <Logo className="me-auto lg:me-0" />
+        <Logo className="me-auto min-w-0 lg:me-0" />
 
         <nav aria-label={t.nav.home} className="mx-auto hidden lg:block">
           <ul className="flex items-center gap-1">
@@ -53,7 +53,7 @@ export async function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-0.5 sm:gap-1">
+        <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
           <Link href={localizeHref(locale, "/search")} aria-label={t.nav.search} title={t.nav.search} className={iconButton}>
             <Search className="size-5" aria-hidden />
           </Link>
@@ -61,14 +61,14 @@ export async function SiteHeader() {
             to={otherLocale}
             text={t.language.switch}
             label={t.language.label}
-            className="hidden sm:inline-flex"
+            className="max-sm:hidden"
           />
           <ThemeToggle label={t.theme.toggle} />
           <Link
             href={localizeHref(locale, "/account")}
             aria-label={t.nav.account}
             title={t.nav.account}
-            className={`${iconButton} hidden sm:inline-flex`}
+            className={`${iconButton} max-sm:hidden`}
           >
             <User className="size-5" aria-hidden />
           </Link>

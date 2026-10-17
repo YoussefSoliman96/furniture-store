@@ -35,7 +35,7 @@ export function ProductCard({
       <div className="flex flex-1 flex-col gap-1 p-4">
         <p className="text-xs text-muted">{loc(locale, product.categoryNameAr, product.categoryNameEn)}</p>
         <h3 className="font-semibold text-foreground transition-colors group-hover:text-primary">{name}</h3>
-        <p className="mt-auto flex items-baseline gap-2 pt-2">
+        <p className="mt-auto flex flex-wrap items-baseline gap-x-2 pt-2">
           <span className="font-bold text-primary">{formatPrice(locale, product.price)}</span>
           {product.compareAtPrice && product.compareAtPrice > product.price && (
             <s className="text-sm text-muted">{formatPrice(locale, product.compareAtPrice)}</s>

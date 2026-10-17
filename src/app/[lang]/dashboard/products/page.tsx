@@ -14,7 +14,7 @@ export async function generateMetadata() {
 }
 
 const iconBtn =
-  "inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
+  "inline-flex size-10 items-center justify-center rounded-md text-muted md:size-8 transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
 const control =
   "rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary";
 
@@ -64,9 +64,10 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
           {filtered ? t.noMatch : t.empty}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface">
-          <table className="w-full min-w-[760px] text-sm">
-            <thead className="border-b border-border text-xs text-muted uppercase">
+        // Table on desktop; on phones each row becomes a card.
+        <div className="rounded-xl border border-border bg-surface md:overflow-x-auto">
+          <table className="w-full text-sm max-md:block md:min-w-[760px]">
+            <thead className="border-b border-border text-xs text-muted uppercase max-md:hidden">
               <tr>
                 <th className="px-4 py-3 text-start font-semibold">{t.product}</th>
                 <th className="px-4 py-3 text-start font-semibold">{t.category}</th>
@@ -76,7 +77,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
                 <th className="px-4 py-3 text-end font-semibold">{t.actions}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border max-md:block">
               {rows.map((p) => {
                 const stockTone =
                   p.stock <= 0
@@ -85,24 +86,32 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
                       ? "text-amber-700 dark:text-amber-400"
                       : "";
                 return (
-                  <tr key={p.id} className={p.isActive ? "" : "bg-surface-muted/60"}>
-                    <td className="px-4 py-3">
+                  <tr
+                    key={p.id}
+                    className={`max-md:grid max-md:grid-cols-[1fr_auto] max-md:gap-x-3 max-md:gap-y-1 max-md:p-4 ${p.isActive ? "" : "bg-surface-muted/60"}`}
+                  >
+                    <td className="px-4 py-3 max-md:col-start-1 max-md:row-start-1 max-md:p-0">
                       <Link href={localizeHref(locale, `/dashboard/products/${p.id}`)} className="font-semibold hover:text-primary">
                         {loc(locale, p.nameAr, p.nameEn)}
                       </Link>
-                      <p className="text-xs text-muted" dir="ltr">
-                        {p.sku}
-                      </p>
+                      <p className="text-xs text-muted">
+                      <bdi dir="ltr">{p.sku}</bdi>
+                    </p>
                     </td>
-                    <td className="px-4 py-3 text-muted">{loc(locale, p.categoryNameAr, p.categoryNameEn)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 text-muted max-md:col-start-1 max-md:row-start-2 max-md:p-0 max-md:text-xs">
+                      {loc(locale, p.categoryNameAr, p.categoryNameEn)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap max-md:col-start-1 max-md:row-start-3 max-md:mt-2 max-md:p-0">
                       {formatPrice(locale, p.price)}
                       {p.compareAtPrice && (
                         <span className="ms-2 text-xs text-muted line-through">{formatPrice(locale, p.compareAtPrice)}</span>
                       )}
                     </td>
-                    <td className={`px-4 py-3 font-bold tabular-nums ${stockTone}`}>{formatNumber(locale, p.stock)}</td>
-                    <td className="px-4 py-3">
+                    <td className={`px-4 py-3 font-bold tabular-nums max-md:col-start-2 max-md:row-start-3 max-md:mt-2 max-md:p-0 ${stockTone}`}>
+                      <span className="me-1 text-xs font-normal text-muted md:hidden">{t.stock}:</span>
+                      {formatNumber(locale, p.stock)}
+                    </td>
+                    <td className="px-4 py-3 max-md:col-span-2 max-md:row-start-4 max-md:mt-1 max-md:p-0">
                       <span className="flex flex-wrap items-center gap-1.5">
                         <span
                           className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
@@ -119,7 +128,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
                         )}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 max-md:col-start-2 max-md:row-span-2 max-md:row-start-1 max-md:-me-2 max-md:p-0">
                       <div className="flex items-center justify-end gap-1">
                         <form action={toggleProduct}>
                           <input type="hidden" name="id" value={p.id} />

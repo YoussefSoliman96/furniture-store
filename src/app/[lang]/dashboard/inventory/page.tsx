@@ -50,9 +50,10 @@ export default async function InventoryPage({ searchParams }: PageProps<"/[lang]
         ))}
       </nav>
 
-      <div className="overflow-x-auto rounded-xl border border-border bg-surface">
-        <table className="w-full min-w-[860px] text-sm">
-          <thead className="border-b border-border text-xs text-muted uppercase">
+      {/* Table on desktop; on phones each row becomes a card (same markup, so forms aren't duplicated). */}
+      <div className="rounded-xl border border-border bg-surface md:overflow-x-auto">
+        <table className="w-full text-sm max-md:block md:min-w-[860px]">
+          <thead className="border-b border-border text-xs text-muted uppercase max-md:hidden">
             <tr>
               <th className="px-4 py-3 text-start font-semibold">{t.product}</th>
               <th className="px-4 py-3 text-start font-semibold">{t.category}</th>
@@ -60,10 +61,10 @@ export default async function InventoryPage({ searchParams }: PageProps<"/[lang]
               <th className="px-4 py-3 text-start font-semibold">{t.adjust}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border max-md:block">
             {items.length === 0 && (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-muted">
+              <tr className="max-md:block">
+                <td colSpan={4} className="px-4 py-8 text-center text-muted max-md:block">
                   {t.noProducts}
                 </td>
               </tr>
@@ -71,8 +72,8 @@ export default async function InventoryPage({ searchParams }: PageProps<"/[lang]
             {items.map((p) => {
               const status = p.stock <= 0 ? "out" : p.stock <= p.lowStockThreshold ? "low" : "ok";
               return (
-                <tr key={p.id}>
-                  <td className="px-4 py-3">
+                <tr key={p.id} className="max-md:grid max-md:grid-cols-[1fr_auto] max-md:gap-x-3 max-md:gap-y-1 max-md:p-4">
+                  <td className="px-4 py-3 max-md:col-start-1 max-md:row-start-1 max-md:p-0">
                     <Link
                       href={localizeHref(locale, `/dashboard/products/${p.id}?from=inventory`)}
                       title={t.editProduct}
@@ -80,12 +81,14 @@ export default async function InventoryPage({ searchParams }: PageProps<"/[lang]
                     >
                       {loc(locale, p.nameAr, p.nameEn)}
                     </Link>
-                    <p className="text-xs text-muted" dir="ltr">
-                      {p.sku}
+                    <p className="text-xs text-muted">
+                      <bdi dir="ltr">{p.sku}</bdi>
                     </p>
                   </td>
-                  <td className="px-4 py-3 text-muted">{loc(locale, p.categoryNameAr, p.categoryNameEn)}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-muted max-md:col-start-1 max-md:row-start-2 max-md:p-0 max-md:text-xs">
+                    {loc(locale, p.categoryNameAr, p.categoryNameEn)}
+                  </td>
+                  <td className="px-4 py-3 max-md:col-start-2 max-md:row-span-2 max-md:row-start-1 max-md:self-center max-md:p-0">
                     <span className="flex items-center gap-2">
                       <span className="w-8 text-lg font-bold tabular-nums">{formatNumber(locale, p.stock)}</span>
                       <span
@@ -101,7 +104,7 @@ export default async function InventoryPage({ searchParams }: PageProps<"/[lang]
                       </span>
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 max-md:col-span-2 max-md:mt-3 max-md:p-0">
                     <AdjustStockForm productId={p.id} t={t} />
                   </td>
                 </tr>

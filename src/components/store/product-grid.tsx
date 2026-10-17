@@ -60,11 +60,12 @@ export function CategoryChips({
   activeSlug?: string;
 }) {
   const chip =
-    "inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors";
+    "inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors";
   const on = "border-primary bg-primary text-primary-foreground";
   const off = "border-border bg-surface text-muted hover:border-primary hover:text-primary";
   return (
-    <nav className="-mx-4 mt-8 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+    // Swipeable row on phones; the scrollbar is hidden since the cut-off chip already hints at more.
+    <nav className="-mx-4 mt-8 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
       <ul className="flex gap-2">
         <li>
           <Link href={localizeHref(locale, "/shop")} className={`${chip} ${activeSlug ? off : on}`}>

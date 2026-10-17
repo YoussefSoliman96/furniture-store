@@ -8,7 +8,8 @@ import { PageHeader } from "@/components/dashboard/page-header";
 
 export async function generateMetadata() {
   const t = await getDictionary();
-  return { title: t.dashboard.overview };
+  // The layout's title template only applies to child segments, not this page.
+  return { title: { absolute: `${t.dashboard.overview} | ${t.dashboard.title}` } };
 }
 
 export default async function DashboardOverview() {

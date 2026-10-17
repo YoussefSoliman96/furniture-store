@@ -69,7 +69,7 @@ export default async function HomePage() {
             <h2 className="font-display text-3xl font-semibold text-foreground">{t.shop.featured}</h2>
             <Link
               href={localizeHref(locale, "/shop")}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
             >
               {t.shop.viewAll}
               <Arrow className="size-4" aria-hidden />

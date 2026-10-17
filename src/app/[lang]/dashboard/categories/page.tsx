@@ -14,7 +14,7 @@ export async function generateMetadata() {
 }
 
 const iconBtn =
-  "inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
+  "inline-flex size-10 items-center justify-center rounded-md text-muted md:size-8 transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
 
 export default async function AdminCategoriesPage() {
   const locale = await getLocale();
@@ -36,9 +36,9 @@ export default async function AdminCategoriesPage() {
       {rows.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-10 text-center text-muted">{t.empty}</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface">
-          <table className="w-full min-w-[640px] text-sm">
-            <thead className="border-b border-border text-start text-xs text-muted uppercase">
+        <div className="rounded-xl border border-border bg-surface md:overflow-x-auto">
+          <table className="w-full text-sm max-md:block md:min-w-[640px]">
+            <thead className="border-b border-border text-start text-xs text-muted uppercase max-md:hidden">
               <tr>
                 <th className="w-24 px-4 py-3 text-start font-semibold">{t.order}</th>
                 <th className="px-4 py-3 text-start font-semibold">{t.title}</th>
@@ -47,10 +47,10 @@ export default async function AdminCategoriesPage() {
                 <th className="px-4 py-3 text-end font-semibold">{t.actions}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border max-md:block">
               {rows.map((c, i) => (
-                <tr key={c.id} className={c.isActive ? "" : "bg-surface-muted/60"}>
-                  <td className="px-4 py-3">
+                <tr key={c.id} className={`max-md:grid max-md:grid-cols-[auto_1fr_auto] max-md:items-center max-md:gap-x-3 max-md:gap-y-2 max-md:p-4 ${c.isActive ? "" : "bg-surface-muted/60"}`}>
+                  <td className="px-4 py-3 max-md:col-start-1 max-md:row-start-2 max-md:p-0">
                     <div className="flex gap-1">
                       <form action={moveCategory}>
                         <input type="hidden" name="id" value={c.id} />
@@ -74,7 +74,7 @@ export default async function AdminCategoriesPage() {
                       </form>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 max-md:col-span-2 max-md:col-start-1 max-md:row-start-1 max-md:p-0">
                     <div className="flex items-center gap-3">
                       <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
                         <CategoryIcon name={c.icon} className="size-4.5" />
@@ -84,15 +84,18 @@ export default async function AdminCategoriesPage() {
                         <p className="text-xs text-muted">
                           {/* The name in the other language, when it differs from the one shown above. */}
                           {(locale === "ar" ? c.nameEn : c.nameEn && c.nameAr) && (
-                            <>{locale === "ar" ? c.nameEn : c.nameAr} · </>
+                            <><bdi>{locale === "ar" ? c.nameEn : c.nameAr}</bdi> · </>
                           )}
-                          <span dir="ltr">/{c.slug}</span>
+                          <bdi dir="ltr" className="whitespace-nowrap">/{c.slug}</bdi>
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 tabular-nums">{formatNumber(locale, c.productCount)}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 tabular-nums max-md:col-start-2 max-md:row-start-2 max-md:p-0 max-md:text-xs max-md:text-muted">
+                    <span className="me-1 md:hidden">{t.products}:</span>
+                    {formatNumber(locale, c.productCount)}
+                  </td>
+                  <td className="px-4 py-3 max-md:col-start-3 max-md:row-start-2 max-md:p-0">
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                         c.isActive
@@ -103,7 +106,7 @@ export default async function AdminCategoriesPage() {
                       {c.isActive ? t.visible : t.hidden}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 max-md:col-start-3 max-md:row-start-1 max-md:-me-2 max-md:p-0">
                     <div className="flex items-center justify-end gap-1">
                       <form action={toggleCategory}>
                         <input type="hidden" name="id" value={c.id} />
