@@ -9,6 +9,7 @@ import { defaultLocale, hasLocale, localizeHref } from "@/i18n/config";
 import { getDictionaryFor } from "@/i18n/dictionaries";
 import { assertAdmin } from "@/lib/auth/guard";
 import { TAGS } from "@/lib/data/catalog";
+import { slugify } from "@/lib/slug";
 
 type Field =
   | "nameEn"
@@ -53,13 +54,6 @@ const MAX_QTY = 10_000;
 // Products that were sold or returned keep their history; they can only be hidden.
 const SALES_REASONS = ["sale", "return"] as const;
 
-const slugify = (value: string) =>
-  value
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
 
 const str = (formData: FormData, key: string) => String(formData.get(key) ?? "").trim();
 
@@ -114,7 +108,7 @@ export async function saveProduct(_prev: ProductFormState, formData: FormData): 
     isFeatured: formData.get("isFeatured") === "on",
     isActive: formData.get("isActive") === "on",
   };
-  if (!values.slug) values.slug = slugify(values.nameEn);
+  if (!values.slug) values.slug = slugify(values.nameEn || values.nameAr) || slugify(values.sku);
   // Stock is only set here on create; afterwards it changes through logged movements.
   const initialStock = id ? 0 : wholeNumber(raw.initialStock || "0", 0, MAX_QTY);
 
@@ -123,7 +117,7 @@ export async function saveProduct(_prev: ProductFormState, formData: FormData): 
     if (required && !value) errors[field] = "required";
     else if (value.length > max) errors[field] = "tooLong";
   };
-  text("nameEn", values.nameEn, 120, true);
+  text("nameEn", values.nameEn, 120); // optional: the store falls back to the Arabic name
   text("nameAr", values.nameAr, 120, true);
   text("descriptionEn", values.descriptionEn, 2000);
   text("descriptionAr", values.descriptionAr, 2000);

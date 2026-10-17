@@ -115,7 +115,7 @@ export function CategoryForm({
         </label>
         <label className="block text-sm font-semibold">
           {t.nameEn}
-          <input {...english("nameEn")} onInput={onEnglishInput} required maxLength={80} defaultValue={category?.nameEn} className={input} />
+          <input {...english("nameEn")} onInput={onEnglishInput} maxLength={80} defaultValue={category?.nameEn} className={input} />
           {canTranslate && <span className="mt-1 block text-xs font-normal text-muted">{t.englishHint}</span>}
           {fieldError("nameEn")}
         </label>

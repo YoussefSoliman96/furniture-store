@@ -1,5 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { categories, products } from "@/db/schema";
 
@@ -17,7 +17,7 @@ export async function getCategories() {
     .select()
     .from(categories)
     .where(eq(categories.isActive, true))
-    .orderBy(asc(categories.sortOrder), asc(categories.nameEn));
+    .orderBy(asc(categories.sortOrder), asc(sql`coalesce(nullif(${categories.nameEn}, ''), ${categories.nameAr})`));
 }
 
 export async function getCategoryBySlug(slug: string) {
@@ -65,7 +65,7 @@ export async function getProducts(categorySlug?: string) {
         categorySlug ? eq(categories.slug, categorySlug) : undefined,
       ),
     )
-    .orderBy(asc(categories.sortOrder), desc(products.isFeatured), asc(products.nameEn));
+    .orderBy(asc(categories.sortOrder), desc(products.isFeatured), asc(sql`coalesce(nullif(${products.nameEn}, ''), ${products.nameAr})`));
 }
 
 export async function getFeaturedProducts(limit = 8) {

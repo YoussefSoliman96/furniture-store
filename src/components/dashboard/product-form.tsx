@@ -6,6 +6,7 @@ import { saveProduct, type ProductFormState } from "@/lib/actions/products";
 import { localizeHref, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import type { Product } from "@/db/schema";
+import { loc } from "@/lib/format";
 
 const input =
   "mt-1.5 block w-full rounded-lg border border-border bg-background px-3 py-2.5 text-foreground outline-none transition-colors focus:border-primary aria-[invalid=true]:border-red-500";
@@ -70,7 +71,7 @@ export function ProductForm({
           </label>
           <label className="block text-sm font-semibold">
             {t.nameEn}
-            <input {...field("nameEn")} dir="ltr" required maxLength={120} defaultValue={value("nameEn", product?.nameEn)} className={input} />
+            <input {...field("nameEn")} dir="ltr" maxLength={120} defaultValue={value("nameEn", product?.nameEn)} className={input} />
             {fieldError("nameEn")}
           </label>
         </div>
@@ -88,7 +89,7 @@ export function ProductForm({
               </option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {locale === "ar" ? c.nameAr : c.nameEn}
+                  {loc(locale, c.nameAr, c.nameEn)}
                 </option>
               ))}
             </select>

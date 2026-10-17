@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 
-/** Pick the Arabic or English variant of a bilingual field. */
-export const loc = (locale: Locale, ar: string, en: string) => (locale === "ar" ? ar : en);
+/** Pick the Arabic or English variant of a bilingual field. English is optional: fall back to Arabic. */
+export const loc = (locale: Locale, ar: string, en: string) => (locale === "en" && en.trim() ? en : ar);
 
 const intlLocale = (locale: Locale) => (locale === "ar" ? "ar-EG" : "en-EG");
 

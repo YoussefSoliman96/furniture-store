@@ -82,7 +82,11 @@ export default async function AdminCategoriesPage() {
                       <div className="min-w-0">
                         <p className="font-semibold">{loc(locale, c.nameAr, c.nameEn)}</p>
                         <p className="text-xs text-muted">
-                          {loc(locale, c.nameEn, c.nameAr)} · <span dir="ltr">/{c.slug}</span>
+                          {/* The name in the other language, when it differs from the one shown above. */}
+                          {(locale === "ar" ? c.nameEn : c.nameEn && c.nameAr) && (
+                            <>{locale === "ar" ? c.nameEn : c.nameAr} · </>
+                          )}
+                          <span dir="ltr">/{c.slug}</span>
                         </p>
                       </div>
                     </div>

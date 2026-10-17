@@ -8,6 +8,7 @@ import { categories, products } from "@/db/schema";
 import { defaultLocale, hasLocale, localizeHref } from "@/i18n/config";
 import { assertAdmin } from "@/lib/auth/guard";
 import { TAGS } from "@/lib/data/catalog";
+import { slugify } from "@/lib/slug";
 import { translateToEnglish, translationEnabled } from "@/lib/translate";
 import { isCategoryIcon } from "@/components/ui/category-icon";
 
@@ -18,13 +19,6 @@ export type CategoryFormState = { errors?: Partial<Record<Field, ErrorCode>> } |
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const UUID_RE = /^[0-9a-f-]{36}$/i;
 
-const slugify = (value: string) =>
-  value
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
 
 const str = (formData: FormData, key: string) => String(formData.get(key) ?? "").trim();
 
@@ -70,11 +64,11 @@ export async function saveCategory(_prev: CategoryFormState, formData: FormData)
     isActive: formData.get("isActive") === "on",
   };
   await fillMissingEnglish(values);
-  if (!values.slug) values.slug = slugify(values.nameEn);
+  if (!values.slug) values.slug = slugify(values.nameEn || values.nameAr, 60);
 
   const errors: NonNullable<CategoryFormState>["errors"] = {};
-  if (!values.nameEn) errors.nameEn = "required";
-  else if (values.nameEn.length > 80) errors.nameEn = "tooLong";
+  // English is optional; the store shows the Arabic name where it is missing.
+  if (values.nameEn.length > 80) errors.nameEn = "tooLong";
   if (!values.nameAr) errors.nameAr = "required";
   else if (values.nameAr.length > 80) errors.nameAr = "tooLong";
   if (!values.slug) errors.slug = "required";
