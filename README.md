@@ -35,8 +35,8 @@ Using local Postgres instead of Supabase: run `npm run db:local` in another term
 ## Moving to Supabase
 
 1. Use the **pooler** connection strings (Connect button). The direct `db.<ref>.supabase.co` host is IPv6-only and unreachable from most networks and hosts.
-2. `DATABASE_URL`: transaction pooler, port **6543** (prepared statements are already disabled for it). Keep `DATABASE_POOL_MAX` small.
-3. `DATABASE_MIGRATION_URL`: session pooler, port **5432**, used by `drizzle-kit`.
+2. `DATABASE_URL`: session pooler, port **5432**. Not the transaction pooler (6543): it drops replies to postgres.js's pipelined queries and the app hangs. Keep `DATABASE_POOL_MAX` small; session mode caps total clients (15 on the free tier).
+3. `DATABASE_MIGRATION_URL`: the same session pooler URL, used by `drizzle-kit`.
 4. Add `?sslmode=require` to `DATABASE_URL` and `?uselibpqcompat=true&sslmode=require` to `DATABASE_MIGRATION_URL` (drizzle-kit's `pg` driver otherwise rejects Supabase's own CA), and percent-encode special characters in the password.
 5. Run `npm run dev:all` (or `db:migrate` + `db:seed`) once.
 
