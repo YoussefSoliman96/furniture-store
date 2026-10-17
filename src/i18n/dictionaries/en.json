@@ -246,7 +246,12 @@
     },
     "adjust": "Adjust stock",
     "quantity": "Quantity",
-    "quantityHint": "Negative numbers remove stock.",
+    "quantityHint": "Restocks and returns add stock; sales and damage remove it. For a correction, type a negative number to remove stock.",
+    "direction": {
+      "adds": "Adds to stock",
+      "removes": "Removes from stock",
+      "either": "Type a negative number to remove stock"
+    },
     "reason": "Reason",
     "note": "Note (optional)",
     "apply": "Apply",

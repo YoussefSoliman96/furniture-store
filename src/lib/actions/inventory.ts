@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { inventoryMovements, movementReason, products, type MovementReason } from "@/db/schema";
 import { assertAdmin } from "@/lib/auth/guard";
 import { TAGS } from "@/lib/data/catalog";
+import { signedDelta } from "@/lib/stock-direction";
 
 export type AdjustStockState =
   | { ok: true; at: number }
@@ -20,13 +21,15 @@ export async function adjustStock(_prev: AdjustStockState, formData: FormData): 
   const admin = await assertAdmin();
   const at = Date.now();
   const productId = String(formData.get("productId") ?? "");
-  const delta = Number(formData.get("delta"));
+  const quantity = Number(formData.get("delta"));
   const reason = String(formData.get("reason") ?? "");
   const note = String(formData.get("note") ?? "").trim().slice(0, 200);
 
   if (!UUID_RE.test(productId)) throw new Error("Invalid product");
-  if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 10_000) return { error: "invalidQuantity", at };
+  if (!Number.isInteger(quantity) || quantity === 0 || Math.abs(quantity) > 10_000) return { error: "invalidQuantity", at };
   if (!isReason(reason)) return { error: "invalidReason", at };
+  // The reason sets the direction (a sale always removes stock, even if typed as "2").
+  const delta = signedDelta(reason, quantity);
 
   // One statement: the stock change and its ledger entry land together or not at all,
   // and the guard keeps stock from going negative under concurrent edits.
