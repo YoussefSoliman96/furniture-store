@@ -36,7 +36,14 @@ type ErrorCode =
   | "price"
   | "compareAt"
   | "quantity";
-export type ProductFormState = { errors?: Partial<Record<Field, ErrorCode>> } | undefined;
+export type ProductFormState =
+  | {
+      errors: Partial<Record<Field, ErrorCode>>;
+      /** What was submitted, so the form can be redrawn with it after React resets it. */
+      values: Record<string, string>;
+      at: number;
+    }
+  | undefined;
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SKU_RE = /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/;
@@ -152,7 +159,12 @@ export async function saveProduct(_prev: ProductFormState, formData: FormData): 
     if (!errors.sku && clashes.some((c) => c.sku === values.sku)) errors.sku = "skuTaken";
     if (!errors.slug && clashes.some((c) => c.slug === values.slug)) errors.slug = "slugTaken";
   }
-  if (Object.keys(errors).length) return { errors };
+  const failed = (e: NonNullable<ProductFormState>["errors"]): ProductFormState => ({
+    errors: e,
+    values: Object.fromEntries([...formData].filter(([, v]) => typeof v === "string") as [string, string][]),
+    at: Date.now(),
+  });
+  if (Object.keys(errors).length) return failed(errors);
 
   const row = {
     ...values,
@@ -184,8 +196,8 @@ export async function saveProduct(_prev: ProductFormState, formData: FormData): 
     }
   } catch (error) {
     // A concurrent save can still win the race past the checks above.
-    if (isUniqueViolation(error, "sku")) return { errors: { sku: "skuTaken" } };
-    if (isUniqueViolation(error, "slug")) return { errors: { slug: "slugTaken" } };
+    if (isUniqueViolation(error, "sku")) return failed({ sku: "skuTaken" });
+    if (isUniqueViolation(error, "slug")) return failed({ slug: "slugTaken" });
     throw error;
   }
 

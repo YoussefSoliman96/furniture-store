@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { localizeHref } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getInventory, getRecentMovements, type StockFilter } from "@/lib/data/admin";
@@ -22,7 +23,15 @@ export default async function InventoryPage({ searchParams }: PageProps<"/[lang]
 
   return (
     <div className="space-y-6">
-      <PageHeader title={t.title} intro={t.intro} />
+      <PageHeader title={t.title} intro={t.intro}>
+        <Link
+          href={localizeHref(locale, "/dashboard/products/new?from=inventory")}
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
+        >
+          <Plus className="size-4" aria-hidden />
+          {t.addProduct}
+        </Link>
+      </PageHeader>
 
       <nav className="flex gap-2">
         {filters.map((f) => (
@@ -64,7 +73,13 @@ export default async function InventoryPage({ searchParams }: PageProps<"/[lang]
               return (
                 <tr key={p.id}>
                   <td className="px-4 py-3">
-                    <p className="font-semibold">{loc(locale, p.nameAr, p.nameEn)}</p>
+                    <Link
+                      href={localizeHref(locale, `/dashboard/products/${p.id}?from=inventory`)}
+                      title={t.editProduct}
+                      className="font-semibold hover:text-primary"
+                    >
+                      {loc(locale, p.nameAr, p.nameEn)}
+                    </Link>
                     <p className="text-xs text-muted" dir="ltr">
                       {p.sku}
                     </p>

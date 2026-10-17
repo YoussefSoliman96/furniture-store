@@ -12,7 +12,7 @@ export const dashboardNav = [
 ] as const;
 
 /** Sections that still render the generic placeholder via /dashboard/[section]. */
-export const placeholderSections = ["products", "orders", "customers", "settings"] as const;
+export const placeholderSections = ["orders", "customers", "settings"] as const;
 
 export type PlaceholderSection = (typeof placeholderSections)[number];
 
