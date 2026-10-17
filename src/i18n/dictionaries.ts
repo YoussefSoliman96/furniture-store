@@ -17,6 +17,9 @@ export async function getLocale(): Promise<Locale> {
   return locale;
 }
 
+/** Dictionary for an explicit locale, e.g. in Server Actions (no route params there). */
+export const getDictionaryFor = (locale: Locale): Promise<Dictionary> => dictionaries[locale]();
+
 /** Dictionary for the current locale. Server Components only. */
 export async function getDictionary(): Promise<Dictionary> {
   return dictionaries[await getLocale()]();

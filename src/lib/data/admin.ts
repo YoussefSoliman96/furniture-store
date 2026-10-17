@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gt, lte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, ilike, inArray, lte, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { categories, inventoryMovements, products, users } from "@/db/schema";
 import { assertAdmin } from "@/lib/auth/guard";
@@ -28,6 +28,58 @@ export async function getAdminCategory(id: string) {
   await assertAdmin();
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
   const [row] = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
+  return row ?? null;
+}
+
+export type AdminProductFilters = { q?: string; categoryId?: string };
+
+export async function getAdminProducts({ q, categoryId }: AdminProductFilters = {}) {
+  await assertAdmin();
+  const term = q?.trim().slice(0, 80);
+  // Escape LIKE wildcards so a search for "50%" matches literally.
+  const pattern = term ? `%${term.replace(/[\\%_]/g, "\\$&")}%` : undefined;
+  const sales = db
+    .select({ productId: inventoryMovements.productId, total: count().as("sales") })
+    .from(inventoryMovements)
+    .where(inArray(inventoryMovements.reason, ["sale", "return"]))
+    .groupBy(inventoryMovements.productId)
+    .as("sales");
+  return db
+    .select({
+      id: products.id,
+      sku: products.sku,
+      slug: products.slug,
+      nameAr: products.nameAr,
+      nameEn: products.nameEn,
+      price: products.price,
+      compareAtPrice: products.compareAtPrice,
+      stock: products.stock,
+      lowStockThreshold: products.lowStockThreshold,
+      isActive: products.isActive,
+      isFeatured: products.isFeatured,
+      categorySlug: categories.slug,
+      categoryNameAr: categories.nameAr,
+      categoryNameEn: categories.nameEn,
+      hasSales: sql<boolean>`coalesce(${sales.total}, 0) > 0`,
+    })
+    .from(products)
+    .innerJoin(categories, eq(categories.id, products.categoryId))
+    .leftJoin(sales, eq(sales.productId, products.id))
+    .where(
+      and(
+        categoryId && /^[0-9a-f-]{36}$/i.test(categoryId) ? eq(products.categoryId, categoryId) : undefined,
+        pattern
+          ? or(ilike(products.nameEn, pattern), ilike(products.nameAr, pattern), ilike(products.sku, pattern))
+          : undefined,
+      ),
+    )
+    .orderBy(asc(categories.sortOrder), asc(products.sku));
+}
+
+export async function getAdminProduct(id: string) {
+  await assertAdmin();
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const [row] = await db.select().from(products).where(eq(products.id, id)).limit(1);
   return row ?? null;
 }
 
