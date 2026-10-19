@@ -57,6 +57,7 @@ export async function getAdminProducts({ q, categoryId }: AdminProductFilters = 
       lowStockThreshold: products.lowStockThreshold,
       isActive: products.isActive,
       isFeatured: products.isFeatured,
+      categoryId: categories.id,
       categorySlug: categories.slug,
       categoryNameAr: categories.nameAr,
       categoryNameEn: categories.nameEn,

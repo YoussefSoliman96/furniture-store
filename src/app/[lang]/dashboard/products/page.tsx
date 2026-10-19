@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Eye, EyeOff, Pencil, Plus, Search, Star, Trash2 } from "lucide-react";
+import { ExternalLink, Eye, EyeOff, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { localizeHref } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getAdminCategories, getAdminProducts } from "@/lib/data/admin";
@@ -7,6 +7,8 @@ import { deleteProduct, toggleProduct } from "@/lib/actions/products";
 import { categoryHref } from "@/config/navigation";
 import { formatNumber, formatPrice, loc } from "@/lib/format";
 import { PageHeader } from "@/components/dashboard/page-header";
+import { LiveFilter } from "@/components/dashboard/live-filter";
+import { searchText } from "@/lib/search";
 import { storefrontEnabled } from "@/lib/site-mode";
 
 export async function generateMetadata() {
@@ -16,8 +18,6 @@ export async function generateMetadata() {
 
 const iconBtn =
   "inline-flex size-10 items-center justify-center rounded-md text-muted md:size-8 transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30";
-const control =
-  "rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary";
 
 export default async function AdminProductsPage({ searchParams }: PageProps<"/[lang]/dashboard/products">) {
   const params = await searchParams;
@@ -25,8 +25,8 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
   const categoryId = typeof params.category === "string" ? params.category : "";
   const locale = await getLocale();
   const t = (await getDictionary()).adminProducts;
-  const [rows, categories] = await Promise.all([getAdminProducts({ q, categoryId }), getAdminCategories()]);
-  const filtered = Boolean(q || categoryId);
+  // All products are loaded; the live filter narrows them in the browser as you type.
+  const [rows, categories] = await Promise.all([getAdminProducts(), getAdminCategories()]);
   const showStoreLink = storefrontEnabled();
 
   return (
@@ -41,30 +41,22 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
         </Link>
       </PageHeader>
 
-      <form role="search" className="flex flex-wrap gap-2">
-        <label className="relative min-w-56 flex-1">
-          <span className="sr-only">{t.search}</span>
-          <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />
-          <input name="q" type="search" defaultValue={q} placeholder={t.search} className={`${control} w-full ps-9`} />
-        </label>
-        <select name="category" defaultValue={categoryId} aria-label={t.category} className={control}>
-          <option value="">{t.allCategories}</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {loc(locale, c.nameAr, c.nameEn)}
-            </option>
-          ))}
-        </select>
-        <button type="submit" className="rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:border-primary hover:text-primary">
-          <Search className="size-4 sm:hidden" aria-hidden />
-          <span className="max-sm:sr-only">{t.searchButton}</span>
-        </button>
-      </form>
+      <LiveFilter
+        targetId="product-rows"
+        emptyId="product-no-match"
+        searchLabel={t.search}
+        categoryLabel={t.category}
+        allCategoriesLabel={t.allCategories}
+        categories={categories.map((c) => ({ value: c.id, label: loc(locale, c.nameAr, c.nameEn) }))}
+        defaultQuery={q}
+        defaultCategory={categoryId}
+      />
 
+      <p id="product-no-match" hidden className="rounded-xl border border-dashed border-border p-10 text-center text-muted">
+        {t.noMatch}
+      </p>
       {rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border p-10 text-center text-muted">
-          {filtered ? t.noMatch : t.empty}
-        </p>
+        <p className="rounded-xl border border-dashed border-border p-10 text-center text-muted">{t.empty}</p>
       ) : (
         // Table on desktop; on phones each row becomes a card.
         <div className="rounded-xl border border-border bg-surface md:overflow-x-auto">
@@ -79,7 +71,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
                 <th className="px-4 py-3 text-end font-semibold">{t.actions}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border max-md:block">
+            <tbody id="product-rows" className="divide-y divide-border max-md:block">
               {rows.map((p) => {
                 const stockTone =
                   p.stock <= 0
@@ -90,6 +82,8 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
                 return (
                   <tr
                     key={p.id}
+                    data-search={searchText(p.nameAr, p.nameEn, p.sku, p.categoryNameAr, p.categoryNameEn)}
+                    data-category={p.categoryId}
                     className={`max-md:grid max-md:grid-cols-[1fr_auto] max-md:gap-x-3 max-md:gap-y-1 max-md:p-4 ${p.isActive ? "" : "bg-surface-muted/60"}`}
                   >
                     <td className="px-4 py-3 max-md:col-start-1 max-md:row-start-1 max-md:p-0">
