@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Search, ShoppingBag, User } from "lucide-react";
 import { localizeHref } from "@/i18n/config";
@@ -11,6 +12,7 @@ import { NavLink } from "@/components/ui/nav-link";
 import { Drawer } from "@/components/ui/drawer";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { AdminLink } from "./admin-link";
 
 const iconButton =
   "inline-flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent";
@@ -54,6 +56,9 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+          <Suspense fallback={null}>
+            <AdminLink locale={locale} label={t.nav.dashboard} variant="header" />
+          </Suspense>
           <Link href={localizeHref(locale, "/search")} aria-label={t.nav.search} title={t.nav.search} className={iconButton}>
             <Search className="size-5" aria-hidden />
           </Link>
@@ -112,6 +117,9 @@ async function MobileNav() {
 
   return (
     <div className="flex min-h-full flex-col gap-6 p-4">
+      <Suspense fallback={null}>
+        <AdminLink locale={locale} label={t.nav.dashboard} variant="menu" />
+      </Suspense>
       <nav aria-label={t.nav.home}>
         <ul className="space-y-1">
           {mainNav.map((link) => (
