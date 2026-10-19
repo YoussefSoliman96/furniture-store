@@ -3,9 +3,11 @@ import { locales, localizeHref, type Locale } from "@/i18n/config";
 import { categoryHref, mainNav, productHref } from "@/config/navigation";
 import { getCategories, getProducts } from "@/lib/data/catalog";
 import { siteUrl } from "@/lib/seo";
+import { storefrontEnabled } from "@/lib/site-mode";
 
 /** Public pages in every locale, each listing its hreflang alternates. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (!storefrontEnabled()) return [];
   const [categories, products] = await Promise.all([getCategories(), getProducts()]);
   const paths = [
     ...mainNav.map((item) => item.href),

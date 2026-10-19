@@ -9,6 +9,7 @@ import { Drawer } from "@/components/ui/drawer";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { DashboardNav, DashboardSidebar } from "@/components/dashboard/dashboard-nav";
+import { storefrontEnabled } from "@/lib/site-mode";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getDictionary();
@@ -37,7 +38,12 @@ async function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh bg-background">
-      <DashboardSidebar locale={locale} labels={t.dashboard} brand={<Logo href="/dashboard" />} />
+      <DashboardSidebar
+        locale={locale}
+        labels={t.dashboard}
+        brand={<Logo href="/dashboard" />}
+        showStoreLink={storefrontEnabled()}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-background/90 px-4 backdrop-blur sm:px-6">
@@ -48,7 +54,7 @@ async function AdminShell({ children }: { children: React.ReactNode }) {
             triggerClassName="-ms-2 lg:hidden"
           >
             <div className="flex min-h-full flex-col">
-              <DashboardNav locale={locale} labels={t.dashboard} />
+              <DashboardNav locale={locale} labels={t.dashboard} showStoreLink={storefrontEnabled()} />
             </div>
           </Drawer>
           <p className="me-auto truncate font-semibold">{t.dashboard.title}</p>

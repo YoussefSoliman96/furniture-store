@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, hasLocale, LOCALE_COOKIE, type Locale } from "@/i18n/config";
 import { DEV_LOGIN_PATH, DEV_SIGNED_OUT_COOKIE, devAutoLoginEnabled } from "@/lib/auth/dev";
+import { storefrontEnabled } from "@/lib/site-mode";
 
 // Kept in sync with src/lib/auth/session.ts (not imported: that module pulls in the DB).
 const SESSION_COOKIE = "aziz_session";
@@ -45,6 +46,12 @@ export function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL(`/${first}/login`, request.url));
     }
 
+    // Dashboard-only mode: every storefront page leads to the dashboard (which asks to sign in).
+    const adminArea = pathname.startsWith(`/${first}/dashboard`) || pathname === `/${first}/login`;
+    if (!storefrontEnabled() && !adminArea) {
+      return NextResponse.redirect(new URL(`/${first}/dashboard`, request.url));
+    }
+
     // Remember the language the visitor is browsing in.
     const response = NextResponse.next();
     if (request.cookies.get(LOCALE_COOKIE)?.value !== first) {
@@ -54,7 +61,8 @@ export function proxy(request: NextRequest) {
   }
 
   const url = request.nextUrl.clone();
-  url.pathname = `/${detectLocale(request)}${pathname === "/" ? "" : pathname}`;
+  const locale = detectLocale(request);
+  url.pathname = storefrontEnabled() ? `/${locale}${pathname === "/" ? "" : pathname}` : `/${locale}/dashboard`;
   return NextResponse.redirect(url);
 }
 

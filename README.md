@@ -18,6 +18,7 @@ Using local Postgres instead of Supabase: run `npm run db:local` in another term
 
 - Storefront: `/ar` (default) and `/en`
 - Admin: `/ar/login` → `/ar/dashboard` (admin accounts only)
+- Dashboard-only deployments: unless `STOREFRONT_ENABLED=true`, every storefront URL redirects to the dashboard, robots.txt disallows everything and the sitemap is empty. Admins see a Dashboard button in the store header when it is on.
 - Dev shortcut: with `DEV_AUTO_LOGIN=true` in `.env.local`, `npm run dev` signs you in as `ADMIN_EMAIL` automatically. "Sign out" pauses it until you sign in manually. It never runs in a production build.
 
 `npm run db:local` runs real Postgres binaries via `embedded-postgres` (no Docker needed); data lives in `.data/postgres`.

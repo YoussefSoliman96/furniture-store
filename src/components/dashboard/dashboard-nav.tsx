@@ -34,10 +34,13 @@ export function DashboardNav({
   locale,
   labels,
   collapsed = false,
+  showStoreLink,
 }: {
   locale: Locale;
   labels: DashboardLabels;
   collapsed?: boolean;
+  /** Hidden while the storefront isn't live (dashboard-only deployments). */
+  showStoreLink: boolean;
 }) {
   return (
     <nav aria-label={labels.title} className="flex flex-1 flex-col gap-1 p-3">
@@ -59,15 +62,17 @@ export function DashboardNav({
         );
       })}
 
-      <NavLink
-        href={localizeHref(locale, "/")}
-        exact
-        title={collapsed ? labels.backToStore : undefined}
-        className={`${itemClass} mt-auto ${collapsed ? "justify-center" : ""}`}
-      >
-        <Store className="size-5 shrink-0" aria-hidden />
-        <span className={collapsed ? "sr-only" : ""}>{labels.backToStore}</span>
-      </NavLink>
+      {showStoreLink && (
+        <NavLink
+          href={localizeHref(locale, "/")}
+          exact
+          title={collapsed ? labels.backToStore : undefined}
+          className={`${itemClass} mt-auto ${collapsed ? "justify-center" : ""}`}
+        >
+          <Store className="size-5 shrink-0" aria-hidden />
+          <span className={collapsed ? "sr-only" : ""}>{labels.backToStore}</span>
+        </NavLink>
+      )}
     </nav>
   );
 }
@@ -77,10 +82,12 @@ export function DashboardSidebar({
   locale,
   labels,
   brand,
+  showStoreLink,
 }: {
   locale: Locale;
   labels: DashboardLabels;
   brand: React.ReactNode;
+  showStoreLink: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const toggleLabel = collapsed ? labels.expand : labels.collapse;
@@ -94,7 +101,7 @@ export function DashboardSidebar({
       <div className={`flex h-16 items-center border-b border-border px-4 ${collapsed ? "justify-center" : ""}`}>
         {collapsed ? <span className="brand-mark h-9 w-7 text-primary" aria-hidden /> : brand}
       </div>
-      <DashboardNav locale={locale} labels={labels} collapsed={collapsed} />
+      <DashboardNav locale={locale} labels={labels} collapsed={collapsed} showStoreLink={showStoreLink} />
       <button
         type="button"
         onClick={() => setCollapsed((c) => !c)}

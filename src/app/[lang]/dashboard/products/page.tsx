@@ -7,6 +7,7 @@ import { deleteProduct, toggleProduct } from "@/lib/actions/products";
 import { categoryHref } from "@/config/navigation";
 import { formatNumber, formatPrice, loc } from "@/lib/format";
 import { PageHeader } from "@/components/dashboard/page-header";
+import { storefrontEnabled } from "@/lib/site-mode";
 
 export async function generateMetadata() {
   const t = await getDictionary();
@@ -26,6 +27,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
   const t = (await getDictionary()).adminProducts;
   const [rows, categories] = await Promise.all([getAdminProducts({ q, categoryId }), getAdminCategories()]);
   const filtered = Boolean(q || categoryId);
+  const showStoreLink = storefrontEnabled();
 
   return (
     <div className="space-y-6">
@@ -139,16 +141,18 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/[l
                         <Link href={localizeHref(locale, `/dashboard/products/${p.id}`)} aria-label={t.edit} title={t.edit} className={iconBtn}>
                           <Pencil className="size-4" aria-hidden />
                         </Link>
-                        <a
-                          href={localizeHref(locale, `${categoryHref(p.categorySlug)}/${p.slug}`)}
-                          target="_blank"
-                          rel="noopener"
-                          aria-label={t.viewInStore}
-                          title={t.viewInStore}
-                          className={iconBtn}
-                        >
-                          <ExternalLink className="size-4 rtl:-scale-x-100" aria-hidden />
-                        </a>
+                        {showStoreLink && (
+                          <a
+                            href={localizeHref(locale, `${categoryHref(p.categorySlug)}/${p.slug}`)}
+                            target="_blank"
+                            rel="noopener"
+                            aria-label={t.viewInStore}
+                            title={t.viewInStore}
+                            className={iconBtn}
+                          >
+                            <ExternalLink className="size-4 rtl:-scale-x-100" aria-hidden />
+                          </a>
+                        )}
                         {p.hasSales ? (
                           <button type="button" disabled aria-label={t.delete} title={t.hasSales} className={iconBtn}>
                             <Trash2 className="size-4" aria-hidden />
