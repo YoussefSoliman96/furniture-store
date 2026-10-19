@@ -1,22 +1,18 @@
 import { getDictionary } from "@/i18n/dictionaries";
 
-/** Temporary body for dashboard sections that aren't built yet. */
-export async function SectionPlaceholder({ title, stats = false }: { title: string; stats?: boolean }) {
+/** Body for dashboard sections that aren't built yet: the pulsing logo from the loading screen. */
+export async function SectionPlaceholder({ title }: { title: string }) {
   const t = await getDictionary();
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{title}</h1>
-        <p className="mt-1 text-sm text-muted">{t.dashboard.placeholder}</p>
-      </div>
-      {stats && (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }, (_, i) => (
-            <div key={i} className="h-28 rounded-xl border border-border bg-surface" />
-          ))}
+      <h1 className="text-2xl font-bold">{title}</h1>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-5 rounded-xl border border-dashed border-border bg-surface p-8 text-center">
+        <span className="brand-mark h-20 w-16 animate-pulse text-primary" aria-hidden />
+        <div>
+          <p className="font-display text-xl font-semibold">{t.dashboard.comingSoon}</p>
+          <p className="mt-1 text-sm text-muted">{t.dashboard.placeholder}</p>
         </div>
-      )}
-      <div className="h-96 rounded-xl border border-dashed border-border bg-surface" />
+      </div>
     </div>
   );
 }
